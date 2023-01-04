@@ -17,10 +17,16 @@ namespace WEB.Models
 
         [Required(ErrorMessage = "Id da marca é obrigatório.")]
         [Column("marca_id")]
-        public int MarcaId { get; set; }
+        public int MarcaRefId { get; set; }
+        [ForeignKey("MarcaRefId")]
+        public Marca? Marca { get; set; }
 
         [Required(ErrorMessage = "Id do modelo é obrigatório.")]
         [Column("modelo_id")]
-        public int ModeloId { get; set; }
+        public int ModeloRefId { get; set; }
+        [ForeignKey("ModeloRefId")]
+        public Modelo? Modelo { get; set; }
+
+        public ICollection<Pedido>? Pedidos { get; set; }
     }
 }

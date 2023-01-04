@@ -13,11 +13,15 @@ namespace WEB.Models
 
         [Required(ErrorMessage = "Nome é obrigatório.")]
         [Column("cliente_id")]
-        public int ClienteId { get; set; }
+        public int ClienteRefId { get; set; }
+        [ForeignKey("ClienteRefId")]
+        public Cliente? Cliente { get; set; }
 
         [Required(ErrorMessage = "Id do carro é obrigatório.")]
         [Column("carro_id")]
-        public int CarroId { get; set; }
+        public int CarroRefId { get; set; }
+        [ForeignKey("CarroRefId")]
+        public Carro? Carro { get; set; }
 
         [Required(ErrorMessage = "Data de alocação é obrigatória.")]
         [Column("data_alocacao", TypeName = "DATETIME")]

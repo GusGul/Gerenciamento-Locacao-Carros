@@ -22,9 +22,8 @@ namespace WEB.Controllers
         // GET: Pedidos
         public async Task<IActionResult> Index()
         {
-              return _context.Pedidos != null ? 
-                          View(await _context.Pedidos.ToListAsync()) :
-                          Problem("Entity set 'DbContexto.Pedidos'  is null.");
+            var dbContexto = _context.Pedidos.Include(p => p.Carro).Include(p => p.Cliente);
+            return View(await dbContexto.ToListAsync());
         }
 
         // GET: Pedidos/Details/5
@@ -36,6 +35,8 @@ namespace WEB.Controllers
             }
 
             var pedido = await _context.Pedidos
+                .Include(p => p.Carro)
+                .Include(p => p.Cliente)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (pedido == null)
             {
@@ -48,6 +49,8 @@ namespace WEB.Controllers
         // GET: Pedidos/Create
         public IActionResult Create()
         {
+            ViewData["CarroRefId"] = new SelectList(_context.Carros, "Id", "Nome");
+            ViewData["ClienteRefId"] = new SelectList(_context.Clientes, "Id", "Nome");
             return View();
         }
 
@@ -56,7 +59,7 @@ namespace WEB.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ClienteId,CarroId,DataLocacao,DataEntrega")] Pedido pedido)
+        public async Task<IActionResult> Create([Bind("Id,ClienteRefId,CarroRefId,DataLocacao,DataEntrega")] Pedido pedido)
         {
             if (ModelState.IsValid)
             {
@@ -64,6 +67,8 @@ namespace WEB.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["CarroRefId"] = new SelectList(_context.Carros, "Id", "Nome", pedido.CarroRefId);
+            ViewData["ClienteRefId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteRefId);
             return View(pedido);
         }
 
@@ -80,6 +85,8 @@ namespace WEB.Controllers
             {
                 return NotFound();
             }
+            ViewData["CarroRefId"] = new SelectList(_context.Carros, "Id", "Nome", pedido.CarroRefId);
+            ViewData["ClienteRefId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteRefId);
             return View(pedido);
         }
 
@@ -88,7 +95,7 @@ namespace WEB.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ClienteId,CarroId,DataLocacao,DataEntrega")] Pedido pedido)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,ClienteRefId,CarroRefId,DataLocacao,DataEntrega")] Pedido pedido)
         {
             if (id != pedido.Id)
             {
@@ -115,6 +122,8 @@ namespace WEB.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["CarroRefId"] = new SelectList(_context.Carros, "Id", "Nome", pedido.CarroRefId);
+            ViewData["ClienteRefId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteRefId);
             return View(pedido);
         }
 
@@ -127,6 +136,8 @@ namespace WEB.Controllers
             }
 
             var pedido = await _context.Pedidos
+                .Include(p => p.Carro)
+                .Include(p => p.Cliente)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (pedido == null)
             {

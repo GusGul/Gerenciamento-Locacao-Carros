@@ -23,5 +23,7 @@ namespace WEB.Models
 
         [Column("endereco", TypeName = "text")]
         public string Endereco { get; set; }
+
+        public ICollection<Pedido>? Pedidos { get; set; }
     }
 }

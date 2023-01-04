@@ -14,5 +14,8 @@ namespace WEB.Models
         [Required(ErrorMessage = "Nome é obrigatório.")]
         [Column("nome", TypeName = "varchar(100)")]
         public string Nome { get; set; }
+
+        //[NotMapped]
+        public ICollection<Carro>? Carros { get; set; }
     }
 }
