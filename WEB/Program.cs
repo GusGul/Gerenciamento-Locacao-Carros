@@ -1,7 +1,17 @@
+using Microsoft.EntityFrameworkCore;
+using WEB.Contexto;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<DbContexto>(options =>
+{
+    var conexao = Environment.GetEnvironmentVariable("DATABASE_CDF");
+    if (conexao == null) conexao = "Server=localhost;Database=locacao_carros;Uid=root;Pwd=179179;";
+    options.UseMySql(conexao, ServerVersion.AutoDetect(conexao));
+});
 
 var app = builder.Build();
 

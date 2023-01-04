@@ -9,7 +9,7 @@ namespace WEB.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("cliente_id")]
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         [Required(ErrorMessage = "Nome é obrigatório.")]
         [Column("nome", TypeName = "varchar(100)")]
