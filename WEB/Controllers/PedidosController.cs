@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using WEB.Contexto;
 using WEB.Models;
+using WEB.ModelViews;
 
 namespace WEB.Controllers
 {
@@ -22,8 +24,53 @@ namespace WEB.Controllers
         // GET: Pedidos
         public async Task<IActionResult> Index()
         {
-            var dbContexto = _context.Pedidos.Include(p => p.Carro).Include(p => p.Cliente);
-            return View(await dbContexto.ToListAsync());
+            // Link to sql
+            var pedidos = await Task.FromResult(from ped in _context.Pedidos
+                                join cli in _context.Clientes on ped.ClienteRefId equals cli.Id
+                                join car in _context.Carros on ped.CarroRefId equals car.Id
+                                join mar in _context.Marcas on car.MarcaRefId equals mar.Id
+                                select new PedidoResumido
+                                {
+                                    PedidoId = ped.Id,
+                                    NomeCliente = cli.Nome,
+                                    NomeCarro = car.Nome,
+                                    NomeMarca = mar.Nome,
+                                    DataLocacaoPedido = ped.DataLocacao,
+                                    DataEntregaPedido = ped.DataEntrega
+                                });
+
+            /* Join que salva processamento do BD, nativo do entity.
+            var pedidos = await _context.Pedidos.Join
+            (
+                _context.Clientes,
+                ped => ped.ClienteRefId,
+                cli => cli.Id,
+                (ped, cli) => new
+                {
+                    PedidoId = ped.Id,
+                    DataLocacaoPedido = ped.DataLocacao,
+                    DataEntregaPedido = ped.DataEntrega,
+                    NomeCliente = cli.Nome,
+                    CarroId = ped.CarroRefId
+                }
+            ).Join
+            (
+                _context.Carros,
+                pedCli => pedCli.CarroId,
+                car => car.Id,
+                (pedCli, car) => new PedidoResumido
+                {
+                    PedidoId = pedCli.PedidoId,
+                    NomeCliente = pedCli.NomeCliente,
+                    NomeCarro = car.Nome,
+                    DataLocacaoPedido = pedCli.DataLocacaoPedido,
+                    DataEntregaPedido = pedCli.DataEntregaPedido,
+                }
+            ).ToListAsync();
+            */
+
+            ViewBag.pedidos = pedidos;
+            return View();
         }
 
         // GET: Pedidos/Details/5
@@ -59,10 +106,13 @@ namespace WEB.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ClienteRefId,CarroRefId,DataLocacao,DataEntrega")] Pedido pedido)
+        public async Task<IActionResult> Create([Bind("Id,ClienteRefId,CarroRefId,DataLocacao")] Pedido pedido)
         {
             if (ModelState.IsValid)
             {
+                var config = _context.Configuracoes.FirstOrDefault();
+                var dias = config is not null ? config.DiaDeLocacao : 1;
+                pedido.DataEntrega = pedido.DataLocacao.AddDays(dias);
                 _context.Add(pedido);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

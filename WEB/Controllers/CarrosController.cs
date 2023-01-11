@@ -49,8 +49,12 @@ namespace WEB.Controllers
         // GET: Carros/Create
         public IActionResult Create()
         {
-            ViewData["MarcaRefId"] = new SelectList(_context.Marcas, "Id", "Nome");
-            ViewData["ModeloRefId"] = new SelectList(_context.Modelos, "Id", "Nome");
+            var marcas = _context.Marcas.ToList();
+            var marcaId = marcas[0].Id;
+            var modelos = _context.Modelos.Where(m => m.MarcaId == marcaId).ToList();
+
+            ViewData["MarcaRefId"] = new SelectList(marcas, "Id", "Nome");
+            ViewData["ModeloRefId"] = new SelectList(modelos, "Id", "Nome");
             return View();
         }
 

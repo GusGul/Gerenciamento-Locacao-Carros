@@ -17,5 +17,6 @@ namespace WEB.Models
 
         //[NotMapped]
         public ICollection<Carro>? Carros { get; set; }
+        public ICollection<Modelo>? Modelos { get; set; }
     }
 }

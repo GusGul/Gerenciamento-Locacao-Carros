@@ -1,3 +1,4 @@
+@using WEB.ModelViews;
 @model IEnumerable<WEB.Models.Pedido>
 
 @{
@@ -13,39 +14,45 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Cliente)
+                Cliente
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Carro)
+                Carro
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DataLocacao)
+                Marca do Carro
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DataEntrega)
+                Data de Locação
+            </th>
+            <th>
+                Data de Entrega
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (PedidoResumido pedido in ViewBag.pedidos) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Cliente.Nome)
+                @pedido.NomeCliente
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Carro.Nome)
+                    @pedido.NomeCarro
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.DataLocacao)
+                    @pedido.NomeMarca
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.DataEntrega)
+                    @pedido.DataLocacaoPedido
             </td>
             <td>
-                    <button class="btn btn-warning"><a asp-action="Edit" asp-route-id="@item.Id" class="text-white text-decoration-none">Edit</a></button>
-                    <button class="btn btn-info"><a asp-action="Details" asp-route-id="@item.Id" class="text-white text-decoration-none">Details</a></button>
-                    <button class="btn btn-danger"><a asp-action="Delete" asp-route-id="@item.Id" class="text-white text-decoration-none">Delete</a></button>
+                    @pedido.DataEntregaPedido
+            </td>
+            <td>
+                    <button class="btn btn-warning"><a asp-action="Edit" asp-route-id="@pedido.PedidoId" class="text-white text-decoration-none">Edit</a></button>
+                    <button class="btn btn-info"><a asp-action="Details" asp-route-id="@pedido.PedidoId" class="text-white text-decoration-none">Details</a></button>
+                    <button class="btn btn-danger"><a asp-action="Delete" asp-route-id="@pedido.PedidoId" class="text-white text-decoration-none">Delete</a></button>
             </td>
         </tr>
 }

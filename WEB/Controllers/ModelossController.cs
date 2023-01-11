@@ -10,24 +10,30 @@ using WEB.Models;
 
 namespace WEB.Controllers
 {
-    public class ModelosController : Controller
+    public class ModelossController : Controller
     {
         private readonly DbContexto _context;
 
-        public ModelosController(DbContexto context)
+        public ModelossController(DbContexto context)
         {
             _context = context;
         }
 
-        // GET: Modelos
+        // GET: Modeloss
         public async Task<IActionResult> Index()
         {
-              return _context.Modelos != null ? 
-                          View(await _context.Modelos.ToListAsync()) :
-                          Problem("Entity set 'DbContexto.Modelos'  is null.");
+            var dbContexto = _context.Modelos.Include(m => m.Marca);
+            return View(await dbContexto.ToListAsync());
         }
 
-        // GET: Modelos/Details/5
+        [Route("/marcas.json")]
+        public async Task<IActionResult> JsonFiltradoMarca(int marcaId)
+        {
+            var locacaoContext = _context.Modelos.Where(m => m.MarcaId == marcaId);
+            return StatusCode(200, await locacaoContext.ToListAsync());
+        }
+
+        // GET: Modeloss/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Modelos == null)
@@ -36,6 +42,7 @@ namespace WEB.Controllers
             }
 
             var modelo = await _context.Modelos
+                .Include(m => m.Marca)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (modelo == null)
             {
@@ -45,18 +52,19 @@ namespace WEB.Controllers
             return View(modelo);
         }
 
-        // GET: Modelos/Create
+        // GET: Modeloss/Create
         public IActionResult Create()
         {
+            ViewData["MarcaId"] = new SelectList(_context.Marcas, "Id", "Nome");
             return View();
         }
 
-        // POST: Modelos/Create
+        // POST: Modeloss/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome")] Modelo modelo)
+        public async Task<IActionResult> Create([Bind("Id,Nome,MarcaId")] Modelo modelo)
         {
             if (ModelState.IsValid)
             {
@@ -64,10 +72,11 @@ namespace WEB.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["MarcaId"] = new SelectList(_context.Marcas, "Id", "Nome", modelo.MarcaId);
             return View(modelo);
         }
 
-        // GET: Modelos/Edit/5
+        // GET: Modeloss/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Modelos == null)
@@ -80,15 +89,16 @@ namespace WEB.Controllers
             {
                 return NotFound();
             }
+            ViewData["MarcaId"] = new SelectList(_context.Marcas, "Id", "Nome", modelo.MarcaId);
             return View(modelo);
         }
 
-        // POST: Modelos/Edit/5
+        // POST: Modeloss/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome")] Modelo modelo)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,MarcaId")] Modelo modelo)
         {
             if (id != modelo.Id)
             {
@@ -115,10 +125,11 @@ namespace WEB.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["MarcaId"] = new SelectList(_context.Marcas, "Id", "Nome", modelo.MarcaId);
             return View(modelo);
         }
 
-        // GET: Modelos/Delete/5
+        // GET: Modeloss/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Modelos == null)
@@ -127,6 +138,7 @@ namespace WEB.Controllers
             }
 
             var modelo = await _context.Modelos
+                .Include(m => m.Marca)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (modelo == null)
             {
@@ -136,7 +148,7 @@ namespace WEB.Controllers
             return View(modelo);
         }
 
-        // POST: Modelos/Delete/5
+        // POST: Modeloss/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

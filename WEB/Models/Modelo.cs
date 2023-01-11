@@ -15,6 +15,13 @@ namespace WEB.Models
         [Column("nome", TypeName = "varchar(100)")]
         public string Nome { get; set; }
 
+        [Required(ErrorMessage = "Id da marca é obrigatório.")]
+        [Column("marca_id")]
+        public int MarcaId { get; set; }
+
+        [ForeignKey("MarcaId")]
+        public Marca? Marca { get; set; }
+
         public ICollection<Carro>? Carros { get; set; }
     }
 }
